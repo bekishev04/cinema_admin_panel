@@ -1,0 +1,21 @@
+version: "3.7"
+services:
+  sprint1:
+    container_name: sprint1_db
+    image: postgres:13.3
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      PGDATA: /var/lib/postgresql/data
+      POSTGRES_DB: ${DB_NAME}
+    volumes:
+      - ./docker-volumes/database/:/var/lib/postgresql/data
+    ports:
+      - "${DB_PORT}:5432"
+    networks:
+      - net
+    deploy:
+      replicas: 1
+networks:
+  net:
