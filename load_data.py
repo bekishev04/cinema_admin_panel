@@ -108,7 +108,7 @@ if __name__ == "__main__":
         "host": databases["HOST"],
         "port": databases["PORT"],
     }
-    with sqlite3.connect("sqlite_to_postgres/db.sqlite") as sqlite_con, psycopg2.connect(
-        **dsl, cursor_factory=DictCursor
-    ) as pg_con:
+    with sqlite3.connect(
+        "sqlite_to_postgres/db.sqlite"
+    ) as sqlite_con, psycopg2.connect(**dsl, cursor_factory=DictCursor) as pg_con:
         load_and_save_data(sqlite_con, pg_con)
