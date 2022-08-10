@@ -120,7 +120,7 @@ class PersonFilmWork(UUIDMixin):
         ACTOR = "actor", _("actor")
         DIRECTOR = "director", _("director")
         WRITER = "writer", _("writer")
-        __empty__ = _("(unknown)")
+        __empty__ = _("null")
 
     film_work = models.ForeignKey(
         "FilmWork",
