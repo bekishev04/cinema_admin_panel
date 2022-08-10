@@ -26,7 +26,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-kbc8i5uegb)c4c99n(twj)e!#a&-ge3a5dx4sy_!jsojir=jzq"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DEBUG', False)
+DEBUG = os.environ.get("DEBUG", False)
 
 ALLOWED_HOSTS = ["127.0.0.1"]
 
@@ -77,17 +77,17 @@ WSGI_APPLICATION = "config.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('DB_NAME'),
-        'USER': os.environ.get('DB_USER'),
-        'PASSWORD': os.environ.get('DB_PASSWORD'),
-        'HOST': os.environ.get('DB_HOST_URL', '127.0.0.1'),
-        'PORT': os.environ.get('DB_PORT', 5432),
-        'OPTIONS': {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": os.environ.get("DB_NAME"),
+        "USER": os.environ.get("DB_USER"),
+        "PASSWORD": os.environ.get("DB_PASSWORD"),
+        "HOST": os.environ.get("DB_HOST_URL", "127.0.0.1"),
+        "PORT": os.environ.get("DB_PORT", 5432),
+        "OPTIONS": {
             # Нужно явно указать схемы, с которыми будет работать приложение.
-           'options': '-c search_path=public,content'
-        }
+            "options": "-c search_path=public,content"
+        },
     }
 }
 
@@ -132,3 +132,9 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+LANGUAGES = [
+    ("en", "English"),
+    ("ru", "Russian"),
+]
+
+LOCALE_PATHS = ["movies/locale"]
