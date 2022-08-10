@@ -20,7 +20,7 @@ TABLES = {
 
 
 def get_fields(model) -> str:
-    fields = [field.name for field in dataclasses.fields(model)]
+    fields = model.__dataclass_fields__.keys()
     return ", ".join(fields)
 
 
