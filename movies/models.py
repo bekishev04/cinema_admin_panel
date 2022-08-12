@@ -142,3 +142,9 @@ class PersonFilmWork(UUIDMixin):
             models.Index(fields=["film_work"], name="person_film_work_film_work_id"),
             models.Index(fields=["person"], name="person_film_work_person_id"),
         ]
+        # Mark For Reviewer:
+        # Не добавляю ограниченность дублирования на поля "film_work", "person"
+        # По причине того, что в исходной таблице sqlite данное возможно
+        # Человек может быть одновременно актером и писателем или режиссером в одном фильме
+        # Вот пример в данных того, о чем говорю:
+        # (film_work_id, person_id)=('f94cfce9-fa49-4d36-ab4f-ae0ac9b6037b', 'f5ac8efa-1bd6-42ac-9c82-898146bcebdc')

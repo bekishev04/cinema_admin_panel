@@ -29,8 +29,8 @@ class Genre(BaseModel):
 @dataclass
 class GenreFilmWork:
     id: uuid.UUID
-    film_work_id: uuid.UUID | None
-    genre_id: uuid.UUID | None
+    film_work_id: uuid.UUID
+    genre_id: uuid.UUID
     created_at: datetime.datetime | None
 
 
@@ -42,7 +42,7 @@ class Person(BaseModel):
 @dataclass
 class PersonFilmWork:
     id: uuid.UUID
-    film_work_id: uuid.UUID | None
-    person_id: uuid.UUID | None
+    film_work_id: uuid.UUID
+    person_id: uuid.UUID
     role: str | None
     created_at: datetime.datetime | None

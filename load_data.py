@@ -7,74 +7,36 @@ from psycopg2.extensions import cursor as _cursor
 from psycopg2.extras import DictCursor, execute_values
 
 from config.settings import DATABASES
-from sqlite_to_postgres import sqlite_models
+from sqlite_to_postgres.utils_models import ListModels, ConverterModels
 
 
-TABLES = {
-    "film_work": sqlite_models.FilmWork,
-    "genre": sqlite_models.Genre,
-    "genre_film_work": sqlite_models.GenreFilmWork,
-    "person": sqlite_models.Person,
-    "person_film_work": sqlite_models.PersonFilmWork,
-}
-
-
-def get_fields(model) -> str:
-    fields = model.__dataclass_fields__.keys()
-    return ", ".join(fields)
-
-
-def get_values_in_key_order(data_row, keys):
-    _data = {}
-    for k in keys:
-        _data[k] = dataclasses.asdict(data_row)[k]
-    return tuple(_data.values())
-
-
-def prepare_data(data, model):
-    prepare_data = []
-    model_fields = model.__dataclass_fields__.keys()
-    for row in data:
-        prepare_data.append(get_values_in_key_order(row, model_fields))
-    return prepare_data
-
-
-def load_from_sqlite(cursor: sqlite3.Cursor, table, n: int = 10_000):
+def load_from_sqlite(cursor: sqlite3.Cursor, model, n: int = 10_000):
     """Load data from sqlite with paginate"""
 
-    i = 0
-    fields = get_fields(TABLES[table])
+    fields = ConverterModels.get_fields(model)
 
-    while True:
+    # cursor.execute(f"SELECT {fields} FROM {model.table} LIMIT {n} OFFSET {i};")
+    cursor.execute(f"SELECT {fields} FROM {model.table}")
 
-        cursor.execute(f"SELECT {fields} FROM {table} LIMIT {n} OFFSET {i};")
-
-        i += n
-
-        rows = cursor.fetchall()
-        if rows:
-            yield rows
-        else:
-            break
+    rows = cursor.fetchmany(n)
+    return rows
 
 
-def save_data(table: str, data, pg_cursor: _cursor):
-    model = TABLES[table]
-    fields = get_fields(model)
+def save_data(model, rows, pg_cursor: _cursor):
+    fields = ConverterModels.get_fields(model)
 
-    for rows in data:
-        vals = prepare_data(rows, model)
+    vals = ConverterModels.prepare_data(rows)
 
-        execute_values(
-            pg_cursor,
-            f"""
-            INSERT INTO content.{table} ({fields})
-            VALUES
-            %s
-            ON CONFLICT (id) DO NOTHING
-            """,
-            vals,
-        )
+    execute_values(
+        pg_cursor,
+        f"""
+        INSERT INTO content.{model.table} ({fields})
+        VALUES
+        %s
+        ON CONFLICT (id) DO NOTHING
+        """,
+        vals,
+    )
 
 
 def load_and_save_data(sqlite_con: sqlite3.Connection, pg_con: _connection):
@@ -86,17 +48,17 @@ def load_and_save_data(sqlite_con: sqlite3.Connection, pg_con: _connection):
     sql = open("schema_design/sql.ddl", "r").read()
     pg_cursor.execute(sql)
 
-    for table in TABLES:
+    for model in list(ListModels):
 
         # первый аргумент курсор, второй данные, мапим их в нужный нам dataclass
-        sqlite_con.row_factory = lambda x, y: TABLES[table](*y)
+        sqlite_con.row_factory = lambda x, y: model(*y)
         sqlite_cursor = sqlite_con.cursor()
 
         data = load_from_sqlite(
             sqlite_cursor,
-            table,
+            model,
         )
-        save_data(table, data, pg_cursor)
+        save_data(model, data, pg_cursor)
 
 
 if __name__ == "__main__":
@@ -108,7 +70,12 @@ if __name__ == "__main__":
         "host": databases["HOST"],
         "port": databases["PORT"],
     }
-    with sqlite3.connect(
-        "sqlite_to_postgres/db.sqlite"
-    ) as sqlite_con, psycopg2.connect(**dsl, cursor_factory=DictCursor) as pg_con:
-        load_and_save_data(sqlite_con, pg_con)
+    try:
+        with sqlite3.connect(
+            "sqlite_to_postgres/db.sqlite"
+        ) as sqlite_con, psycopg2.connect(**dsl, cursor_factory=DictCursor) as pg_con:
+            load_and_save_data(sqlite_con, pg_con)
+    finally:
+        sqlite_con.close()
+        pg_con.close()
+    print(sqlite_con, pg_con)
