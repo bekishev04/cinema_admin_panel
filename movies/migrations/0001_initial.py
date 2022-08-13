@@ -13,6 +13,7 @@ class Migration(migrations.Migration):
     dependencies = []
 
     operations = [
+        migrations.RunSQL('create schema if not exists content;'),
         migrations.CreateModel(
             name="FilmWork",
             fields=[

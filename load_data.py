@@ -78,4 +78,3 @@ if __name__ == "__main__":
     finally:
         sqlite_con.close()
         pg_con.close()
-    print(sqlite_con, pg_con)
