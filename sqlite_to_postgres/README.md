@@ -4,7 +4,7 @@
 - All connections between records are saved.
 - The code uses `dataclass`.
 - Data is loaded in batches of n records.
-- Restarting the script does not create duplicate entries.
+- Restarting the script does not create duplicate entites.
 - The code has write and read error handling.
 
 # Проектное задание: перенос данных
